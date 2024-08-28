@@ -15,7 +15,6 @@ import ray
 import utils
 import optimizers
 from policies import *
-import socket
 from shared_noise import *
 
 @ray.remote
@@ -406,8 +405,7 @@ if __name__ == '__main__':
     # for ARS V1 use filter = 'NoFilter'
     parser.add_argument('--filter', type=str, default='MeanStdFilter')
 
-    local_ip = socket.gethostbyname(socket.gethostname())
-    ray.init(redis_address= local_ip + ':6379')
+    ray.init()
     
     args = parser.parse_args()
     params = vars(args)
