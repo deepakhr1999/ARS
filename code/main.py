@@ -45,12 +45,13 @@ def main():
         "shift": config["shift"],
         "seed": 237,
         "policy_type": "linear",
-        "dir_path": f"data/{args.env_name}/{time.time()}",
+        "dir_path": "data",
         "filter": "MeanStdFilter",
     }
 
     for seed in range(4):
         experiment_params["seed"] = seed
+        experiment_params["dir_path"] = f"data/{args.env_name}/{time.time()}"
         run_ars(experiment_params)
 
 
