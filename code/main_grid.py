@@ -43,7 +43,7 @@ def main():
         "n_workers": [10],
         "rollout_length": [1000],
         "shift": [config["shift"]],
-        "seed": [0],
+        "seed": config["seed"],
         "policy_type": ["linear"],
         "dir_path": ["data"],
         "filter": ["MeanStdFilter"],
