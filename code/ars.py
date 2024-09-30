@@ -115,8 +115,11 @@ class Worker(object):
                 pos_reward, pos_steps  = self.rollout(shift = shift)
 
                 # compute reward and number of timesteps used for negative pertubation rollout
-                self.policy.update_weights(w_policy - delta)
-                neg_reward, neg_steps = self.rollout(shift = shift) 
+                if not self.policy_params["one_sided"]:
+                    self.policy.update_weights(w_policy - delta)
+                    neg_reward, neg_steps = self.rollout(shift = shift) 
+                else:
+                    neg_reward, neg_steps = pos_reward, 0
                 steps += pos_steps + neg_steps
 
                 rollout_rewards.append([pos_reward, neg_reward])
@@ -270,11 +273,15 @@ class ARSLearner(object):
         rollout_rewards = rollout_rewards[idx,:]
         
         # normalize rewards by their standard deviation
-        rollout_rewards /= np.std(rollout_rewards)
+        rollout_rewards /= np.std(rollout_rewards if not self.params["one_sided"] else rollout_rewards[:, 0])
 
-        t1 = time.time()
         # aggregate rollouts to form g_hat, the gradient used to compute SGD step
-        g_hat, count = utils.batched_weighted_sum(rollout_rewards[:,0] - rollout_rewards[:,1],
+        if not self.params["one_sided"]:
+            diff = rollout_rewards[:,0] - rollout_rewards[:,1]
+        else:
+            diff = rollout_rewards[:, 0]
+        t1 = time.time()
+        g_hat, count = utils.batched_weighted_sum(diff,
                                                   (self.deltas.get(idx, self.w_policy.size)
                                                    for idx in deltas_idx),
                                                   batch_size = 500)
@@ -361,6 +368,7 @@ def run_ars(params):
     # set policy parameters. Possible filters: 'MeanStdFilter' for v2, 'NoFilter' for v1.
     policy_params={'type':'linear',
                    'ob_filter':params['filter'],
+                   'one_sided':params['one_sided'],
                    'ob_dim':ob_dim,
                    'ac_dim':ac_dim}
 
@@ -386,6 +394,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--env_name', type=str, default='HalfCheetah-v1')
+    parser.add_argument('--one_sided', action='store_true')
     parser.add_argument('--n_iter', '-n', type=int, default=1000)
     parser.add_argument('--n_directions', '-nd', type=int, default=8)
     parser.add_argument('--deltas_used', '-du', type=int, default=8)
