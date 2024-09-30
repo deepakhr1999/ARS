@@ -4,5 +4,6 @@
     "N": [16, 32],
     "b": [4, 8],
     "seed": [1],
+    "one_sided": [true],
     "shift": 1
 }

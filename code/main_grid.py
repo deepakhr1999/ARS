@@ -44,6 +44,7 @@ def main():
         "rollout_length": [1000],
         "shift": [config["shift"]],
         "seed": config["seed"],
+        "one_sided": config["one_sided"],
         "policy_type": ["linear"],
         "dir_path": ["data"],
         "filter": ["MeanStdFilter"],
