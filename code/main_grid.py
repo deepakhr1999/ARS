@@ -50,13 +50,23 @@ def main():
         "filter": ["MeanStdFilter"],
     }
 
+    done = set()
     for experiment_params in ParameterGrid(experiment_params_grid):
-        if experiment_params["n_directions"] < experiment_params["deltas_used"]:
+        experiment_params["deltas_used"] = min(
+            experiment_params["deltas_used"],
+            experiment_params["n_directions"]
+        )
+        if experiment_params["one_sided"]:
+            experiment_params["n_directions"] *= 2
+            experiment_params["deltas_used"] *= 2
+        key = json.dumps(experiment_params)
+        if key in done:
             continue
         print("Running for params")
         print(json.dumps(experiment_params, indent=4))
         experiment_params["dir_path"] = f"data/{args.env_name}/{time.time()}"
         run_ars(experiment_params)
+        done.add(key)
 
 
 if __name__ == "__main__":
