@@ -255,10 +255,12 @@ class ARSLearner(object):
         deltas_idx = np.array(deltas_idx)
         rollout_rewards = np.array(rollout_rewards, dtype = np.float64)
         
-        print('Maximum reward of collected rollouts:', rollout_rewards.max())
+        if evaluate:
+            print('Maximum reward of collected rollouts:', rollout_rewards.max())
         t2 = time.time()
 
-        print('Time to generate rollouts:', t2 - t1)
+        if evaluate:
+            print('Time to generate rollouts:', t2 - t1)
 
         if evaluate:
             return rollout_rewards
@@ -273,8 +275,10 @@ class ARSLearner(object):
         rollout_rewards = rollout_rewards[idx,:]
         
         # normalize rewards by their standard deviation
-        rollout_rewards /= np.std(rollout_rewards if not self.params["one_sided"] else rollout_rewards[:, 0])
-
+        if self.params["n_directions"] > 1:
+            rollout_rewards /= np.std(rollout_rewards if not self.params["one_sided"] else rollout_rewards[:, 0])
+        else:
+            rollout_rewards /= self.delta_std
         # aggregate rollouts to form g_hat, the gradient used to compute SGD step
         if not self.params["one_sided"]:
             diff = rollout_rewards[:,0] - rollout_rewards[:,1]
@@ -287,7 +291,8 @@ class ARSLearner(object):
                                                   batch_size = 500)
         g_hat /= deltas_idx.size
         t2 = time.time()
-        print('time to aggregate rollouts', t2 - t1)
+        if evaluate:
+            print('time to aggregate rollouts', t2 - t1)
         return g_hat
         
 
@@ -297,23 +302,25 @@ class ARSLearner(object):
         """
         
         g_hat = self.aggregate_rollouts()                    
-        print("Euclidean norm of update step:", np.linalg.norm(g_hat))
+        # print("Euclidean norm of update step:", np.linalg.norm(g_hat))
         self.w_policy -= self.optimizer._compute_step(g_hat).reshape(self.w_policy.shape)
         return
 
     def train(self, num_iter):
 
         start = time.time()
-        for i in range(num_iter):
-            
+        i = -1
+        while self.timesteps < 2e8:
+            i += 1
             t1 = time.time()
             self.train_step()
             t2 = time.time()
-            print('total time of one step', t2 - t1)           
-            print('iter ', i,' done')
+            if i % 10000 == 0:
+                print('total time of one step', t2 - t1)           
+                print('iter ', i,' done')
 
             # record statistics every 10 iterations
-            if ((i + 1) % 10 == 0):
+            if ((i + 1) % 10000 == 0):
                 
                 rewards = self.aggregate_rollouts(num_rollouts = 100, evaluate = True)
                 w = ray.get(self.workers[0].get_weights_plus_stats.remote())
@@ -347,8 +354,9 @@ class ARSLearner(object):
             # waiting for increment of all workers
             ray.get(increment_filters_ids)            
             t2 = time.time()
-            print('Time to sync statistics:', t2 - t1)
-                        
+            if i % 10000 == 0:
+                print('Time to sync statistics:', t2 - t1)
+
         return 
 
 def run_ars(params):
