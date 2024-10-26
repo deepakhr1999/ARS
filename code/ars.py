@@ -17,6 +17,15 @@ import optimizers
 from policies import *
 from shared_noise import *
 
+MAX_TIMESTEPS = {
+    'SafetyHalfCheetahVelocity-v1': 240000000,
+    'SafetyWalker2dVelocity-v1': 152526534,
+    'SafetyHumanoidVelocity-v1': 454764405,
+    'SafetyAntVelocity-v1': 159665636,
+    'SafetyHopperVelocity-v1': 58802767,
+    'SafetySwimmerVelocity-v1': 100000000
+}
+
 @ray.remote
 class Worker(object):
     """ 
@@ -310,18 +319,14 @@ class ARSLearner(object):
 
         start = time.time()
         i = -1
-        while self.timesteps < 2e8:
+        while self.timesteps < MAX_TIMESTEPS[self.params["env_name"]]:
             i += 1
             t1 = time.time()
             self.train_step()
             t2 = time.time()
-            if i % 10000 == 0:
-                print('total time of one step', t2 - t1)           
-                print('iter ', i,' done')
 
             # record statistics every 10 iterations
-            if ((i + 1) % 10000 == 0):
-                
+            if ((i + 1) % 10 == 0):
                 rewards = self.aggregate_rollouts(num_rollouts = 100, evaluate = True)
                 w = ray.get(self.workers[0].get_weights_plus_stats.remote())
                 np.savez(self.logdir + "/lin_policy_plus", w)
@@ -354,8 +359,6 @@ class ARSLearner(object):
             # waiting for increment of all workers
             ray.get(increment_filters_ids)            
             t2 = time.time()
-            if i % 10000 == 0:
-                print('Time to sync statistics:', t2 - t1)
 
         return 
 
