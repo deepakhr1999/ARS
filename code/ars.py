@@ -16,6 +16,7 @@ import utils
 import optimizers
 from policies import *
 from shared_noise import *
+from collections import deque
 
 MAX_TIMESTEPS = {
     'SafetyHalfCheetahVelocity-v1': 240000000,
@@ -186,7 +187,8 @@ class ARSLearner(object):
         self.params = params
         self.max_past_avg_reward = float('-inf')
         self.num_episodes_used = float('inf')
-
+        self.gradient_norms = deque([], maxlen=1000)
+        self.max_norms = deque([], maxlen=1000)
         
         # create shared table for storing noise
         print("Creating deltas table.")
@@ -294,14 +296,13 @@ class ARSLearner(object):
         else:
             diff = rollout_rewards[:, 0]
         t1 = time.time()
-        g_hat, count = utils.batched_weighted_sum(diff,
-                                                  (self.deltas.get(idx, self.w_policy.size)
-                                                   for idx in deltas_idx),
-                                                  batch_size = 500)
+        g_hat, count = utils.batched_weighted_sum(
+            diff,
+            (self.deltas.get(idx, self.w_policy.size) for idx in deltas_idx),
+            batch_size=500
+        )
         g_hat /= deltas_idx.size
         t2 = time.time()
-        if evaluate:
-            print('time to aggregate rollouts', t2 - t1)
         return g_hat
         
 
@@ -311,7 +312,8 @@ class ARSLearner(object):
         """
         
         g_hat = self.aggregate_rollouts()                    
-        # print("Euclidean norm of update step:", np.linalg.norm(g_hat))
+        self.gradient_norms.append(np.linalg.norm(g_hat))
+        self.max_norms.append(np.abs(g_hat).max())
         self.w_policy -= self.optimizer._compute_step(g_hat).reshape(self.w_policy.shape)
         return
 
@@ -339,6 +341,8 @@ class ARSLearner(object):
                 logz.log_tabular("MaxRewardRollout", np.max(rewards))
                 logz.log_tabular("MinRewardRollout", np.min(rewards))
                 logz.log_tabular("timesteps", self.timesteps)
+                logz.log_tabular("gradnorms", sum(self.gradient_norms)/len(self.gradient_norms))
+                logz.log_tabular("maxnorms", max(self.max_norms))
                 logz.dump_tabular()
                 
             t1 = time.time()
