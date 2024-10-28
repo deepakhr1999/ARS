@@ -36,6 +36,7 @@ def main():
     experiment_params_grid = {
         "env_name": [args.env_name],
         "n_iter": [1000],
+        "transform": config["transform"],
         "n_directions": config["N"],
         "deltas_used": config["b"],
         "step_size": config["alpha"],

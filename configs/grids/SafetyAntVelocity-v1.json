@@ -5,5 +5,6 @@
     "b": [20, 40, 60, 80],
     "seed": [1],
     "one_sided": [true, false],
-    "shift": 1
+    "shift": 1,
+    "transform": ["signed", "component_clip:0.5", "component_clip:5", "norm_clip:2", "norm_clip:5"]
 }

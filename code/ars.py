@@ -303,6 +303,21 @@ class ARSLearner(object):
         )
         g_hat /= deltas_idx.size
         t2 = time.time()
+        # apply the transformation at the very end
+        if self.params["transform"] == "signed":
+            g_hat = np.sign(g_hat)
+        if "clip" in self.params["transform"]:
+            clip_algo, arg = self.params["transform"].split(":")
+            arg = float(arg)
+            if clip_algo == "component_clip":
+                g_hat = np.clip(g_hat, -arg, arg)
+            elif clip_algo == "norm_clip":
+                g_norm = np.linalg.norm(g_hat)
+                if g_norm > arg:
+                    g_hat = g_hat / g_norm * arg
+            else:
+                print(f"got transform={self.params['transform']}")
+                raise
         return g_hat
         
 
@@ -384,6 +399,7 @@ def run_ars(params):
     policy_params={'type':'linear',
                    'ob_filter':params['filter'],
                    'one_sided':params['one_sided'],
+                   'transform':params['transform'],
                    'ob_dim':ob_dim,
                    'ac_dim':ac_dim}
 
