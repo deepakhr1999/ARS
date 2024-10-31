@@ -45,7 +45,6 @@ def main():
         "rollout_length": [1000],
         "shift": [config["shift"]],
         "seed": config["seed"],
-        "one_sided": config["one_sided"],
         "policy_type": ["linear"],
         "dir_path": ["data"],
         "filter": ["MeanStdFilter"],
@@ -57,9 +56,6 @@ def main():
             experiment_params["deltas_used"],
             experiment_params["n_directions"]
         )
-        if experiment_params["one_sided"]:
-            experiment_params["n_directions"] *= 2
-            experiment_params["deltas_used"] *= 2
         key = json.dumps(experiment_params)
         if key in done:
             continue
