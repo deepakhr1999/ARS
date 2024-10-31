@@ -1,17 +1,44 @@
+import json
 import os
 from sklearn.model_selection import ParameterGrid
-import json
+import pandas as pd
 
-def get_total_runs(env_name):
+def load_config(env_name):
     config_path = f"configs/grids/{env_name}.json"
     with open(config_path, encoding="utf-8") as file:
-        grid = json.load(file)
-    grid["shift"] = [grid["shift"]]
-    grid = ParameterGrid(grid)
-    return len(grid)
+        return json.load(file)
 
-for env_name in os.listdir("data"):
-    total_runs = get_total_runs(env_name)
-    runs_done = len(os.listdir(f"data/{env_name}/")) - 4
-    percentage_completed = round(100 * runs_done / total_runs, 2)
-    print(env_name.ljust(30), f"{runs_done}/{total_runs}".rjust(8), f"{percentage_completed:.2f}%".rjust(10))
+
+def main():
+    ans = []
+    for env in [
+        "SafetySwimmerVelocity-v1",
+        "SafetyHopperVelocity-v1",
+        "SafetyHalfCheetahVelocity-v1",
+        "SafetyWalker2dVelocity-v1",
+        "SafetyAntVelocity-v1",
+        "SafetyHumanoidVelocity-v1",
+    ]:
+        experiment_params_grid = load_config(env)
+        experiment_params_grid["shift"] = [experiment_params_grid["shift"]]
+
+        done = set()
+        for experiment_params in ParameterGrid(experiment_params_grid):
+            experiment_params["b"] = min(
+                experiment_params["b"],
+                experiment_params["N"]
+            )
+            key = json.dumps(experiment_params)
+            done.add(key)
+        path = f"data/{env}"
+        ans.append((
+            env.replace("Safety","").replace("Velocity-v1", ""),
+            len(done),
+            len(os.listdir(path)) if os.path.exists(path) else 0
+        ))
+    return pd.DataFrame(ans, columns=["task", "total", "completed"])
+
+if __name__ == "__main__":
+
+    print(main())
+

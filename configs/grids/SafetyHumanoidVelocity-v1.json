@@ -4,6 +4,7 @@
     "N": [230, 350],
     "b": [100, 230, 1000],
     "seed": [1],
-    "shift": 1,
-    "transform": ["none", "signed", "component_clip:0.5", "component_clip:10", "norm_clip:1", "norm_clip:5"]
+    "shift": 5,
+    "filter": ["MeanStdFilter", "NoFilter"],
+    "transform": ["none", "signed", "component_clip:0.5", "norm_clip:1"]
 }

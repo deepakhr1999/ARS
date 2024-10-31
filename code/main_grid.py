@@ -47,7 +47,7 @@ def main():
         "seed": config["seed"],
         "policy_type": ["linear"],
         "dir_path": ["data"],
-        "filter": ["MeanStdFilter"],
+        "filter": config["filter"],
     }
 
     done = set()

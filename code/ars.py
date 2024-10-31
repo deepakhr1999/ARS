@@ -19,12 +19,12 @@ from shared_noise import *
 from collections import deque
 
 MAX_TIMESTEPS = {
-    'SafetyHalfCheetahVelocity-v1': 240000000,
-    'SafetyWalker2dVelocity-v1': 152526534,
-    'SafetyHumanoidVelocity-v1': 454764405,
-    'SafetyAntVelocity-v1': 159665636,
-    'SafetyHopperVelocity-v1': 58802767,
-    'SafetySwimmerVelocity-v1': 100000000
+    'SafetyHalfCheetahVelocity-v1': 10_000_000,
+    'SafetyWalker2dVelocity-v1': 10_000_000,
+    'SafetyHumanoidVelocity-v1': 10_000_000,
+    'SafetyAntVelocity-v1': 10_000_000,
+    'SafetyHopperVelocity-v1': 10_000_000,
+    'SafetySwimmerVelocity-v1': 10_000_000
 }
 
 @ray.remote
