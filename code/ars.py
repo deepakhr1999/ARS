@@ -19,11 +19,11 @@ from shared_noise import *
 from collections import deque
 
 MAX_TIMESTEPS = {
-    'SafetyHalfCheetahVelocity-v1': 10_000_000,
-    'SafetyWalker2dVelocity-v1': 10_000_000,
-    'SafetyHumanoidVelocity-v1': 10_000_000,
-    'SafetyAntVelocity-v1': 10_000_000,
-    'SafetyHopperVelocity-v1': 10_000_000,
+    'SafetyHalfCheetahVelocity-v1': 150_000_000,
+    'SafetyWalker2dVelocity-v1': 150_000_000,
+    'SafetyHumanoidVelocity-v1': 150_000_000,
+    'SafetyAntVelocity-v1': 150_000_000,
+    'SafetyHopperVelocity-v1': 30_000_000,
     'SafetySwimmerVelocity-v1': 10_000_000
 }
 
