@@ -323,10 +323,28 @@ class ARSLearner(object):
         self.w_policy -= self.optimizer._compute_step(g_hat).reshape(self.w_policy.shape)
         return
 
+    def write_to_file(self, start, i):
+        rewards = self.aggregate_rollouts(num_rollouts = 100, evaluate = True)
+        w = ray.get(self.workers[0].get_weights_plus_stats.remote())
+        np.savez(self.logdir + "/lin_policy_plus", w)
+        
+        print(sorted(self.params.items()))
+        logz.log_tabular("Time", time.time() - start)
+        logz.log_tabular("Iteration", i + 1)
+        logz.log_tabular("AverageReward", np.mean(rewards))
+        logz.log_tabular("StdRewards", np.std(rewards))
+        logz.log_tabular("MaxRewardRollout", np.max(rewards))
+        logz.log_tabular("MinRewardRollout", np.min(rewards))
+        logz.log_tabular("timesteps", self.timesteps)
+        logz.log_tabular("gradnorms", sum(self.gradient_norms)/(1 + len(self.gradient_norms)))
+        logz.log_tabular("maxnorms", max(self.max_norms, default=0))
+        logz.dump_tabular()
+
     def train(self, num_iter):
 
         start = time.time()
         i = -1
+        self.write_to_file(start, i)
         while self.timesteps < MAX_TIMESTEPS[self.params["env_name"]]:
             i += 1
             t1 = time.time()
@@ -335,21 +353,7 @@ class ARSLearner(object):
 
             # record statistics every 10 iterations
             if ((i + 1) % 10 == 0):
-                rewards = self.aggregate_rollouts(num_rollouts = 100, evaluate = True)
-                w = ray.get(self.workers[0].get_weights_plus_stats.remote())
-                np.savez(self.logdir + "/lin_policy_plus", w)
-                
-                print(sorted(self.params.items()))
-                logz.log_tabular("Time", time.time() - start)
-                logz.log_tabular("Iteration", i + 1)
-                logz.log_tabular("AverageReward", np.mean(rewards))
-                logz.log_tabular("StdRewards", np.std(rewards))
-                logz.log_tabular("MaxRewardRollout", np.max(rewards))
-                logz.log_tabular("MinRewardRollout", np.min(rewards))
-                logz.log_tabular("timesteps", self.timesteps)
-                logz.log_tabular("gradnorms", sum(self.gradient_norms)/len(self.gradient_norms))
-                logz.log_tabular("maxnorms", max(self.max_norms))
-                logz.dump_tabular()
+                self.write_to_file(start, i)
                 
             t1 = time.time()
             # get statistics from all workers

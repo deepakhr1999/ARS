@@ -6,5 +6,5 @@
     "seed": [1],
     "shift": 0,
     "filter": ["MeanStdFilter", "NoFilter"],
-    "transform": ["none", "signed", "component_clip:0.5", "norm_clip:2"]
+    "transform": ["none", "signed", "component_clip:0.5", "norm_clip:1"]
 }
