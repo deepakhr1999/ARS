@@ -65,5 +65,8 @@ def main():
         update_layout(fig, task + ": " + algo, "Timesteps", "Reward", row=1, col=1, upkwargs=dict(width=1000, height=800))
         fig.write_image(f"static/{task}_{algo}.png", scale=1)
 
+    return best_data[["algo", "task", "best_reward", "transform"]]
 
 
+if __name__ == "__main__":
+    main()

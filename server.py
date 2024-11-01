@@ -11,10 +11,10 @@ app = Flask(__name__)
 def home():
     # Generate the DataFrame
     df = main()
-    plotter()
+    best_data = plotter()
     # Convert DataFrame to HTML table with Bootstrap classes
     table_html = df.to_html(classes='table table-striped table-bordered', index=False)
-
+    best_data_html = best_data.to_html(classes='table table-striped table-bordered', index=False)
     # HTML template with mobile-responsive design
     html_template = '''
     <!DOCTYPE html>
@@ -34,7 +34,10 @@ def home():
         <div class="container my-4">
             <h2 class="text-center">Data Table</h2>
             <div class="table-responsive">
-                {{ table|safe }}
+                {{ table1|safe }}
+            </div>
+            <div class="table-responsive">
+                {{ table2|safe }}
             </div>
             <div class="image-container">
                 {% for image_path in images %}
@@ -47,7 +50,7 @@ def home():
     '''
 
     # Render the HTML template and pass the table HTML
-    return render_template_string(html_template, table=table_html, images=os.listdir("static"))
+    return render_template_string(html_template, table1=table_html, table2=best_data_html, images=os.listdir("static"))
 
 
 

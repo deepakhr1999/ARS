@@ -19,10 +19,10 @@ from shared_noise import *
 from collections import deque
 
 MAX_TIMESTEPS = {
-    'SafetyHalfCheetahVelocity-v1': 150_000_000,
-    'SafetyWalker2dVelocity-v1': 150_000_000,
-    'SafetyHumanoidVelocity-v1': 150_000_000,
-    'SafetyAntVelocity-v1': 150_000_000,
+    'SafetyHalfCheetahVelocity-v1': 50_000_000,
+    'SafetyWalker2dVelocity-v1': 50_000_000,
+    'SafetyHumanoidVelocity-v1': 80_000_000,
+    'SafetyAntVelocity-v1': 50_000_000,
     'SafetyHopperVelocity-v1': 30_000_000,
     'SafetySwimmerVelocity-v1': 10_000_000
 }
@@ -147,7 +147,33 @@ class Worker(object):
         self.policy.observation_filter.sync(other)
         return
 
+
+class PastData:
+    def __init__(self):
+        self.timesteps = []
+        self.rewards = []
     
+    def append(self, timestep, reward):
+        self.timesteps.append(timestep)
+        self.rewards.append(reward)
+    
+    def should_break(self):
+        if len(self.timesteps) == 0:
+            return False
+        
+        if self.timesteps[-1] - self.timesteps[0] < 1e6:
+            return False
+        
+        # there is window of more than million steps
+        # if the max over this window is negative, we break
+        idx = len(self.timesteps)-1
+        best_reward = -float('inf')
+        while self.timesteps[-1] - self.timesteps[idx] < 1e6:
+            best_reward = max(best_reward, self.rewards)
+            idx -= 1
+        return best_reward < 0
+        
+
 class ARSLearner(object):
     """ 
     Object class implementing the ARS algorithm.
@@ -182,8 +208,7 @@ class ARSLearner(object):
         self.logdir = logdir
         self.shift = shift
         self.params = params
-        self.max_past_avg_reward = float('-inf')
-        self.num_episodes_used = float('inf')
+        self.past_data = PastData()
         self.gradient_norms = deque([], maxlen=1000)
         self.max_norms = deque([], maxlen=1000)
         
@@ -297,6 +322,8 @@ class ARSLearner(object):
         # apply the transformation at the very end
         if self.params["transform"] == "signed":
             g_hat = np.sign(g_hat)
+            # or the norm would be quite big.
+            g_hat /= np.linalg.norm(g_hat) 
         if "clip" in self.params["transform"]:
             clip_algo, arg = self.params["transform"].split(":")
             arg = float(arg)
@@ -329,9 +356,10 @@ class ARSLearner(object):
         np.savez(self.logdir + "/lin_policy_plus", w)
         
         print(sorted(self.params.items()))
+        avg_reward = np.mean(rewards)
         logz.log_tabular("Time", time.time() - start)
         logz.log_tabular("Iteration", i + 1)
-        logz.log_tabular("AverageReward", np.mean(rewards))
+        logz.log_tabular("AverageReward", avg_reward)
         logz.log_tabular("StdRewards", np.std(rewards))
         logz.log_tabular("MaxRewardRollout", np.max(rewards))
         logz.log_tabular("MinRewardRollout", np.min(rewards))
@@ -339,6 +367,7 @@ class ARSLearner(object):
         logz.log_tabular("gradnorms", sum(self.gradient_norms)/(1 + len(self.gradient_norms)))
         logz.log_tabular("maxnorms", max(self.max_norms, default=0))
         logz.dump_tabular()
+        self.past_data.append(avg_reward, self.timesteps)
 
     def train(self, num_iter):
 
@@ -354,6 +383,8 @@ class ARSLearner(object):
             # record statistics every 10 iterations
             if ((i + 1) % 10 == 0):
                 self.write_to_file(start, i)
+                if self.past_data.should_break():
+                    break
                 
             t1 = time.time()
             # get statistics from all workers
