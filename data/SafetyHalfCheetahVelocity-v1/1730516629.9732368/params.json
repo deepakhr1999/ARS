@@ -1,0 +1,16 @@
+{
+    "delta_std": 0.02,
+    "deltas_used": 20,
+    "dir_path": "data/SafetyHalfCheetahVelocity-v1/1730516629.9732368",
+    "env_name": "SafetyHalfCheetahVelocity-v1",
+    "filter": "NoFilter",
+    "n_directions": 40,
+    "n_iter": 1000,
+    "n_workers": 10,
+    "policy_type": "linear",
+    "rollout_length": 1000,
+    "seed": 1,
+    "shift": 0,
+    "step_size": 0.02,
+    "transform": "component_clip:0.5"
+}
