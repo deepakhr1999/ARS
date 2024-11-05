@@ -6,12 +6,16 @@ from server_plot import main as plotter
 
 app = Flask(__name__)
 
+def time_left(row):
+    return (row["total"] - row["completed"] + 1) * row["Time"]
 
 @app.route('/')
 def home():
     # Generate the DataFrame
     df = main()
-    best_data = plotter()
+    best_data, time_taken = plotter()
+    df = df.merge(time_taken, "inner", "task")
+    df["Est time. left"] = df.apply(time_left, axis=1)
     # Convert DataFrame to HTML table with Bootstrap classes
     table_html = df.to_html(classes='table table-striped table-bordered', index=False)
     best_data_html = best_data.to_html(classes='table table-striped table-bordered', index=False)
@@ -28,6 +32,7 @@ def home():
             /* Additional custom styling for mobile-friendliness */
             .container { max-width: 100%; }
             .table { width: 600px; max-width: 100%; margin: 0px auto 0px auto;}
+            .table-responsive { width: 100%; max-width: 100%;}
         </style>
     </head>
     <body>

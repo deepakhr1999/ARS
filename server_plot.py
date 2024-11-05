@@ -23,16 +23,24 @@ def main():
         except:
             return -1
 
+    def get_time_taken(dir_path):
+        try:
+            x = pd.read_csv(dir_path+"/log.txt", sep="\t")
+            return x["Time"].max() / 3600
+        except:
+            return -1
+
     def label_algorithm(filter):
         if filter == "MeanStdFilter":
             return "ARS-v2"
         return "ARS-v1"
 
     all_data['reward'] = all_data.dir_path.apply(get_best_reward)
+    all_data['time'] = all_data.dir_path.apply(get_time_taken)
     all_data = all_data[all_data.reward > 0]
     all_data['task'] = all_data.env_name.str.replace("Safety", '').str.replace("Velocity-v1", '')
     all_data["algo"] = all_data["filter"].apply(label_algorithm)
-    all_data
+
     all_data['best_env_reward'] = all_data.groupby(["task", "algo", "transform"]).reward.transform('max')
     data = (
         all_data[all_data.reward == all_data.best_env_reward]
@@ -65,7 +73,9 @@ def main():
         update_layout(fig, task + ": " + algo, "Timesteps", "Reward", row=1, col=1, upkwargs=dict(width=1000, height=800))
         fig.write_image(f"static/{task}_{algo}.png", scale=1)
 
-    return best_data[["algo", "task", "best_reward", "transform"]]
+    time_taken = all_data.groupby("task")["time"].mean().round(2).reset_index()
+    time_taken.columns = ["task", "Time"]
+    return best_data[["algo", "task", "best_reward", "transform"]], time_taken
 
 
 if __name__ == "__main__":
