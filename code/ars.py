@@ -169,7 +169,7 @@ class PastData:
         idx = len(self.timesteps)-1
         best_reward = -float('inf')
         while self.timesteps[-1] - self.timesteps[idx] < 1e6:
-            best_reward = max(best_reward, self.rewards)
+            best_reward = max(best_reward, self.rewards[idx])
             idx -= 1
         return best_reward < 0
         
@@ -383,8 +383,8 @@ class ARSLearner(object):
             # record statistics every 10 iterations
             if ((i + 1) % 10 == 0):
                 self.write_to_file(start, i)
-                if self.past_data.should_break():
-                    break
+                # if self.past_data.should_break():
+                #     break
                 
             t1 = time.time()
             # get statistics from all workers
