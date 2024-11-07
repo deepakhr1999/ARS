@@ -3,7 +3,7 @@
     "nu": [0.02],
     "N": [80],
     "b": [20, 40, 60, 80],
-    "seed": [1],
+    "seed": [2, 3, 4, 5],
     "shift": 1,
     "filter": ["MeanStdFilter", "NoFilter"],
     "transform": ["none", "signed", "component_clip:0.5", "norm_clip:1"]

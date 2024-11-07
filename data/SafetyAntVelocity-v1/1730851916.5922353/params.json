@@ -1,0 +1,16 @@
+{
+    "delta_std": 0.02,
+    "deltas_used": 20,
+    "dir_path": "data/SafetyAntVelocity-v1/1730851916.5922353",
+    "env_name": "SafetyAntVelocity-v1",
+    "filter": "MeanStdFilter",
+    "n_directions": 80,
+    "n_iter": 1000,
+    "n_workers": 10,
+    "policy_type": "linear",
+    "rollout_length": 1000,
+    "seed": 5,
+    "shift": 1,
+    "step_size": 0.02,
+    "transform": "norm_clip:1"
+}

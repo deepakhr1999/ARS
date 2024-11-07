@@ -73,7 +73,7 @@ def main():
         update_layout(fig, task + ": " + algo, "Timesteps", "Reward", row=1, col=1, upkwargs=dict(width=1000, height=800))
         fig.write_image(f"static/{task}_{algo}.png", scale=1)
 
-    time_taken = all_data.groupby("task")["time"].mean().round(2).reset_index()
+    time_taken = all_data.groupby("task")["time"].max().round(2).reset_index()
     time_taken.columns = ["task", "Time"]
     return best_data[["algo", "task", "best_reward", "transform"]], time_taken
 
