@@ -1,0 +1,16 @@
+{
+    "delta_std": 0.03,
+    "deltas_used": 8,
+    "dir_path": "data/SafetyHopperVelocity-v1/1730822741.0988395",
+    "env_name": "SafetyHopperVelocity-v1",
+    "filter": "MeanStdFilter",
+    "n_directions": 16,
+    "n_iter": 1000,
+    "n_workers": 10,
+    "policy_type": "linear",
+    "rollout_length": 1000,
+    "seed": 3,
+    "shift": 1,
+    "step_size": 0.02,
+    "transform": "component_clip:0.5"
+}
