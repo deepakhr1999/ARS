@@ -1,0 +1,71 @@
+from progress import main
+from flask import Flask, render_template_string
+import pandas as pd
+import os
+from server_plot import main as plotter
+
+app = Flask(__name__)
+
+def time_left(row):
+    return (row["total"] - row["completed"] + 1) * row["Time"]
+
+my_counts = {
+    "Humanoid": 10,
+    "Walker2d": 8,
+    "Hopper": 6,
+    "Ant": 4,
+}
+
+@app.route('/')
+def home():
+    # Generate the DataFrame
+    df = main()
+    df["total"] = df.task.apply(lambda x: my_counts.get(x, 10))
+    best_data, time_taken = plotter()
+    df = df.merge(time_taken, "inner", "task")
+    df["Est time. left"] = df.apply(time_left, axis=1)
+    # Convert DataFrame to HTML table with Bootstrap classes
+    table_html = df.to_html(classes='table table-striped table-bordered', index=False)
+    best_data_html = best_data.to_html(classes='table table-striped table-bordered', index=False)
+    # HTML template with mobile-responsive design
+    html_template = '''
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Runs tracker</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            /* Additional custom styling for mobile-friendliness */
+            .container { max-width: 100%; }
+            .table { width: 600px; max-width: 100%; margin: 0px auto 0px auto;}
+            .table-responsive { width: 100%; max-width: 100%;}
+        </style>
+    </head>
+    <body>
+        <div class="container my-4">
+            <h2 class="text-center">Data Table</h2>
+            <div class="table-responsive">
+                {{ table1|safe }}
+            </div>
+            <div class="table-responsive">
+                {{ table2|safe }}
+            </div>
+            <div class="image-container">
+                {% for image_path in images %}
+                    <img src="{{ url_for('static', filename=image_path) }}" alt="Image {{ loop.index }}" width=600px style="max-width:90%">
+                {% endfor %}
+            </div>
+        </div>
+    </body>
+    </html>
+    '''
+
+    # Render the HTML template and pass the table HTML
+    return render_template_string(html_template, table1=table_html, table2=best_data_html, images=os.listdir("static"))
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
