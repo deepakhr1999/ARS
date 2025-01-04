@@ -1,0 +1,10 @@
+{
+    "alpha": [0.005],
+    "nu": [0.02],
+    "N": [1],
+    "b": [1],
+    "seed": [3, 4, 5],
+    "shift": 0,
+    "filter": ["MeanStdFilter"],
+    "transform": ["signed", "none", "component_clip:0.5", "norm_clip:1"]
+}
