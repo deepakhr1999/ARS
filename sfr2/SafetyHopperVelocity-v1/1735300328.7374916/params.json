@@ -1,7 +1,7 @@
 {
     "delta_std": 0.02,
     "deltas_used": 1,
-    "dir_path": "data/SafetyHopperVelocity-v1/1735300328.7374916",
+    "dir_path": "sfr2/SafetyHopperVelocity-v1/1735300328.7374916",
     "env_name": "SafetyHopperVelocity-v1",
     "filter": "MeanStdFilter",
     "n_directions": 1,

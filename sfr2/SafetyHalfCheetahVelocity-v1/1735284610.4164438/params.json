@@ -1,7 +1,7 @@
 {
     "delta_std": 0.02,
     "deltas_used": 1,
-    "dir_path": "data/SafetyHalfCheetahVelocity-v1/1735284610.4164438",
+    "dir_path": "sfr2/SafetyHalfCheetahVelocity-v1/1735284610.4164438",
     "env_name": "SafetyHalfCheetahVelocity-v1",
     "filter": "MeanStdFilter",
     "n_directions": 1,

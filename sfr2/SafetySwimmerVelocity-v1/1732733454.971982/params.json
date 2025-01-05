@@ -1,7 +1,7 @@
 {
     "delta_std": 0.02,
     "deltas_used": 1,
-    "dir_path": "data/SafetySwimmerVelocity-v1/1732733454.971982",
+    "dir_path": "sfr2/SafetySwimmerVelocity-v1/1732733454.971982",
     "env_name": "SafetySwimmerVelocity-v1",
     "filter": "NoFilter",
     "n_directions": 1,
