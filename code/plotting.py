@@ -83,12 +83,18 @@ def update_layout(
         title={
             "text": title,
             "x": 0.53,
-            "font": {"size": 15},
+            "font": {"size": 18},
+        },
+        xaxis={
+            "title": {"text": xlabel, "font": {"size": 16}}
+        },
+        yaxis={
+            "title": {"text": ylabel, "font": {"size": 16}}
         },
         **upkwargs,
     )
     fig.update_xaxes(
-        title_text=xlabel,
+        # title_text=xlabel,
         mirror=True,
         ticks="outside",
         showline=True,
@@ -99,7 +105,7 @@ def update_layout(
         **uxkwargs,
     )
     fig.update_yaxes(
-        title_text=ylabel,
+        # title_text=ylabel,
         mirror=True,
         ticks="outside",
         showline=True,

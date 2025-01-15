@@ -9,9 +9,11 @@ import json
 
 def main():
     records = []
-    for experiment_file in glob.glob("data/*/*/params.json", recursive=True):
+    for experiment_file in glob.glob("sfr2/*/*/params.json", recursive=True):
         with open(experiment_file, "r", encoding="utf-8") as file:
             record = json.load(file)
+            if "Walker" not in record["env_name"]:
+                continue
             records.append(record)
 
     all_data = pd.DataFrame.from_records(records)
@@ -32,8 +34,8 @@ def main():
 
     def label_algorithm(filter):
         if filter == "MeanStdFilter":
-            return "ARS-v2"
-        return "ARS-v1"
+            return "SFR-v2"
+        return "SFR-v1"
 
     all_data['reward'] = all_data.dir_path.apply(get_best_reward)
     all_data['time'] = all_data.dir_path.apply(get_time_taken)
@@ -71,6 +73,7 @@ def main():
         fig = px.line(data_frame=frame, x="steps", y="reward", color="transform")
         fig.update_traces(opacity=.7)
         update_layout(fig, task + ": " + algo, "Timesteps", "Reward", row=1, col=1, upkwargs=dict(width=1000, height=800))
+        fig.update_yaxes(range=[0, None])
         fig.write_image(f"static/{task}_{algo}.png", scale=1)
 
     time_taken = all_data.groupby("task")["time"].max().round(2).reset_index()

@@ -381,7 +381,7 @@ class ARSLearner(object):
             t2 = time.time()
 
             # record statistics every 10 iterations
-            if ((i + 1) % 10 == 0):
+            if ((i + 1) % 800 == 0):
                 self.write_to_file(start, i)
                 # if self.past_data.should_break():
                 #     break
@@ -404,7 +404,7 @@ class ARSLearner(object):
             # waiting for increment of all workers
             ray.get(increment_filters_ids)            
             t2 = time.time()
-
+        self.write_to_file(start, i)
         return 
 
 def run_ars(params):

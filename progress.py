@@ -4,7 +4,7 @@ from sklearn.model_selection import ParameterGrid
 import pandas as pd
 
 def load_config(env_name):
-    config_path = f"configs/grids/{env_name}.json"
+    config_path = f"configs/sfr-2/{env_name}.json"
     with open(config_path, encoding="utf-8") as file:
         return json.load(file)
 
@@ -16,8 +16,8 @@ def main():
         "SafetyHopperVelocity-v1",
         "SafetyHalfCheetahVelocity-v1",
         "SafetyWalker2dVelocity-v1",
-        "SafetyAntVelocity-v1",
-        "SafetyHumanoidVelocity-v1",
+        # "SafetyAntVelocity-v1",
+        # "SafetyHumanoidVelocity-v1",
     ]:
         experiment_params_grid = load_config(env)
         experiment_params_grid["shift"] = [experiment_params_grid["shift"]]
@@ -30,7 +30,7 @@ def main():
             )
             key = json.dumps(experiment_params)
             done.add(key)
-        path = f"data/{env}"
+        path = f"sfr2/{env}"
         ans.append((
             env.replace("Safety","").replace("Velocity-v1", ""),
             len(done),

@@ -55,7 +55,7 @@ def home():
     '''
 
     # Render the HTML template and pass the table HTML
-    return render_template_string(html_template, table1=table_html, table2=best_data_html, images=os.listdir("static"))
+    return render_template_string(html_template, table1=table_html, table2=best_data_html, images=[file for file in os.listdir("static") if "Walker" in file])
 
 
 

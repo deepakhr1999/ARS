@@ -24,7 +24,7 @@ def parse_arguments():
 
 
 def load_config(env_name):
-    config_path = f"configs/grids/{env_name}.json"
+    config_path = f"configs/sfr-2/{env_name}.json"
     with open(config_path, encoding="utf-8") as file:
         return json.load(file)
 
@@ -61,7 +61,7 @@ def main():
             continue
         print("Running for params")
         print(json.dumps(experiment_params, indent=4))
-        experiment_params["dir_path"] = f"data/{args.env_name}/{time.time()}"
+        experiment_params["dir_path"] = f"sfr2/{args.env_name}/{time.time()}"
         run_ars(experiment_params)
         done.add(key)
 
