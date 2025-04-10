@@ -1,9 +1,9 @@
 {
-    "alpha": [0.02],
-    "nu": [0.02],
+    "alpha": [0.005, 0.01, 0.015],
+    "nu": [0.02, 0.015],
     "N": [1],
     "b": [1],
-    "seed": [2,3,4,5],
+    "seed": [2,3,4],
     "shift": 0,
     "filter": ["MeanStdFilter"],
     "transform": ["none", "signed", "component_clip:0.5", "norm_clip:1"]

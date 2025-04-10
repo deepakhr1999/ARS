@@ -8,3 +8,9 @@ python code/main_grid.py SafetyHalfCheetahVelocity-v1
 
 
 flask --app server run --host=0.0.0.0 --debug
+
+tmux new-session -d "conda activate sb; python code/main_grid.py SafetySwimmerVelocity-v1"
+tmux new-session -d "conda activate sb; python code/main_grid.py SafetyHopperVelocity-v1"
+tmux new-session -d "conda activate sb; python code/main_grid.py SafetyHalfCheetahVelocity-v1"
+tmux new-session -d "conda activate sb; python code/main_grid.py SafetyWalker2dVelocity-v1"
+tmux new-session -d "flask --app server run --host=0.0.0.0 --debug"

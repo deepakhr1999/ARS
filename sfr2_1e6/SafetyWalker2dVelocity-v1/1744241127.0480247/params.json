@@ -1,0 +1,16 @@
+{
+    "delta_std": 0.025,
+    "deltas_used": 1,
+    "dir_path": "sfr2_1e6/SafetyWalker2dVelocity-v1/1744241127.0480247",
+    "env_name": "SafetyWalker2dVelocity-v1",
+    "filter": "MeanStdFilter",
+    "n_directions": 1,
+    "n_iter": 1000,
+    "n_workers": 10,
+    "policy_type": "linear",
+    "rollout_length": 1000,
+    "seed": 4,
+    "shift": 1,
+    "step_size": 0.0015,
+    "transform": "none"
+}
